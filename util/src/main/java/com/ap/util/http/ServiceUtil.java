@@ -1,4 +1,4 @@
-package com.ap.util.util.http;
+package com.ap.util.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ public class ServiceUtil {
 
     @Autowired
     public ServiceUtil(
-        @Value("${server.port}") String port) {
+            @Value("${server.port}") String port) {
 
         this.port = port;
     }

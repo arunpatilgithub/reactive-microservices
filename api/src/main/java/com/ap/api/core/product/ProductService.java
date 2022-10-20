@@ -12,7 +12,7 @@ public interface ProductService {
      * @return the product, if found, else null
      */
     @GetMapping(
-        value    = "/product/{productId}",
-        produces = "application/json")
-     Product getProduct(@PathVariable int productId);
+            value = "/product/{productId}",
+            produces = "application/json")
+    Product getProduct(@PathVariable int productId);
 }

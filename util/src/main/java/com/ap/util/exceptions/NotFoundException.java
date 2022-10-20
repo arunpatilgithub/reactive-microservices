@@ -1,4 +1,4 @@
-package com.ap.util.util.exceptions;
+package com.ap.util.exceptions;
 
 public class NotFoundException extends RuntimeException {
 

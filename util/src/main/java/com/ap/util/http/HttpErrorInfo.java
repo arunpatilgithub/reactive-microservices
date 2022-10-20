@@ -1,4 +1,4 @@
-package com.ap.util.util.http;
+package com.ap.util.http;
 
 import lombok.Value;
 import org.springframework.http.HttpStatus;
@@ -26,5 +26,5 @@ public class HttpErrorInfo {
         this.path = path;
         this.message = message;
     }
-    
+
 }
