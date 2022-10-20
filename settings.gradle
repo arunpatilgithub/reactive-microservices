@@ -1,0 +1,6 @@
+include ':api'
+include ':util'
+include ':core:product-service'
+include ':core:review-service'
+include ':core:recommendation-service'
+include ':core:product-composite-service'
