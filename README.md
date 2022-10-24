@@ -1,5 +1,5 @@
 # microservices
-Code for practice from the book HHands-On Microservices with Spring Boot and Spring Cloud
+Code for practice from the book Hands-On Microservices with Spring Boot and Spring Cloud
 
 **Step 1: Build all microservices**
 
