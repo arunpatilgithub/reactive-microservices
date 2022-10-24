@@ -1,5 +1,7 @@
-# microservices
-Code for practice from the book Hands-On Microservices with Spring Boot and Spring Cloud
+This repository is referenced from the book "**_Hands-On Microservices with Spring Boot and Spring Cloud_**"
+
+![img.png](architecture.png)
+
 
 **Step 1: Build all microservices**
 
