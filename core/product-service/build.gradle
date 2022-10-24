@@ -1,6 +1,7 @@
 buildscript {
     ext {
         springBootVersion = '2.7.4'
+        mapstructVersion = '1.5.3.Final'
     }
 
     repositories {
@@ -30,6 +31,10 @@ tasks.named("jar") {
     enabled = false
 }
 
+test {
+    useJUnitPlatform()
+}
+
 dependencies {
     implementation project(':api')
     implementation project(':util')
@@ -38,9 +43,30 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
 
+    //Mapstruct dependencies
+    implementation("org.mapstruct:mapstruct:${mapstructVersion}")
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    //For IDE's
+    compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
+    //mongodb dependencies
+    implementation('org.springframework.boot:spring-boot-starter-data-mongodb')
+    testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
+
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    //
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'junit', module: 'junit'
+    }
+
+    //Junit5 dependency.
+    testImplementation('org.junit.jupiter:junit-jupiter-api:5.9.1')
+    testImplementation('org.junit.jupiter:junit-jupiter-engine:5.9.1')
+
 }

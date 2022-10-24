@@ -1,6 +1,16 @@
 server:
   port: 7007
 
+logging:
+  level:
+    root: INFO
+    com.ap: DEBUG
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+
+spring.data.mongodb:
+  host: localhost
+  port: 27017
+  database: product-db
 ---
 server.port: 8080
 spring:

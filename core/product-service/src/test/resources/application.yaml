@@ -1,0 +1,9 @@
+spring:
+  mongodb:
+    embedded:
+      version: 3.4.9
+logging:
+  level:
+    root: INFO
+    com.ap: DEBUG
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG

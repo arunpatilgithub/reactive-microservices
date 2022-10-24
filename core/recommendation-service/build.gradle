@@ -1,3 +1,18 @@
+buildscript {
+    ext {
+        springBootVersion = '2.7.4'
+        mapstructVersion = '1.5.3.Final'
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
 plugins {
     id 'org.springframework.boot' version '2.7.4'
     id 'io.spring.dependency-management' version '1.0.14.RELEASE'
@@ -24,6 +39,17 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
+
+    //Mapstruct dependencies
+    implementation("org.mapstruct:mapstruct:${mapstructVersion}")
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    //For IDE's
+    compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
+    //mongodb dependencies
+    implementation('org.springframework.boot:spring-boot-starter-data-mongodb')
+    testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
 
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
