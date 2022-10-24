@@ -26,8 +26,8 @@ api:
       email: arun.patil@mail.com
   product-composite:
     get-composite-product:
-      description: Returns a composite view of the specified product id
-      notes: |
+      summary: Returns a composite view of the specified product id
+      description: |
         # Normal response
         If the requested product id is found the method will return information regarding:
         1. Base product information

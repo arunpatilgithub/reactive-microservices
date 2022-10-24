@@ -11,12 +11,12 @@ public interface ProductCompositeService {
     /**
      * Sample usage: curl $HOST:$PORT/product-composite/1
      *
-     * @param productId
+     * @param productId ID value for the product
      * @return the composite product info, if found, else null
      */
     @Operation(
-            summary = "${api.product-composite.get-composite-product.description}",
-            description = "${api.product-composite.get-composite-product.notes}")
+            summary = "${api.product-composite.get-composite-product.summary}",
+            description = "${api.product-composite.get-composite-product.description}")
     @ApiResponses(value = {
                             @ApiResponse(responseCode = "400",
                                          description = "Bad Request, invalid format of the request.See response " +
