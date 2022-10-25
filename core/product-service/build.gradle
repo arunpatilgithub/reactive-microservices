@@ -60,7 +60,9 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
 
-    //
+    //To make lombok and mapstruct work together.
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'junit', module: 'junit'
     }

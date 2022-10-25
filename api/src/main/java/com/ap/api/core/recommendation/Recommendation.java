@@ -1,8 +1,10 @@
 package com.ap.api.core.recommendation;
 
-import lombok.Value;
+import lombok.Getter;
+import lombok.Setter;
 
-@Value
+@Getter
+@Setter
 public class Recommendation {
 
     int productId;

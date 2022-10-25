@@ -1,8 +1,15 @@
 server:
   port: 7002
 
+server.error.include-message: always
+
+spring.data.mongodb:
+  host: localhost
+  port: 27017
+  database: recommendation-db
 ---
 server.port: 8080
+spring.data.mongodb.host: mongodb
 spring:
   config:
     activate:

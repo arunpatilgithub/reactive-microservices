@@ -21,7 +21,7 @@ plugins {
 
 group = 'com.ap.microservices.core.review'
 version = '1.0.0-SNAPSHOT'
-sourceCompatibility = '1.8'
+sourceCompatibility = "11"
 
 repositories {
     mavenCentral()
@@ -56,6 +56,9 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
+    //To make lombok and mapstruct work together.
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
 }
@@ -63,3 +66,4 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+targetCompatibility = JavaVersion.VERSION_11
