@@ -21,7 +21,7 @@ plugins {
 
 group = 'com.ap.microservices.core.review'
 version = '1.0.0-SNAPSHOT'
-sourceCompatibility = "11"
+sourceCompatibility = '1.8'
 
 repositories {
     mavenCentral()
@@ -66,4 +66,3 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
-targetCompatibility = JavaVersion.VERSION_11
