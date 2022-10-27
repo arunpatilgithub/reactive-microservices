@@ -51,7 +51,7 @@ dependencies {
     compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
     //mongodb dependencies
-    implementation('org.springframework.boot:spring-boot-starter-data-mongodb')
+    implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
     testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
 
     compileOnly 'org.projectlombok:lombok:1.18.24'

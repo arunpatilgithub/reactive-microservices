@@ -8,32 +8,29 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import reactor.core.publisher.Mono;
 
 public interface ProductCompositeService {
 
     /**
      * Sample usage: curl $HOST:$PORT/product-composite/1
      *
-     * @param productId ID value for the product
+     * @param productId
      * @return the composite product info, if found, else null
      */
     @Operation(
             summary = "${api.product-composite.get-composite-product.summary}",
             description = "${api.product-composite.get-composite-product.description}")
     @ApiResponses(value = {
-                            @ApiResponse(responseCode = "400",
-                                         description = "Bad Request, invalid format of the request.See response " +
-                                                "message for more information."),
-                            @ApiResponse(responseCode = "404",
-                                         description = "Not found, the specified id does not exist."),
-                            @ApiResponse(responseCode = "422",
-                                         description = "Unprocessable entity, input parameters caused the processing " +
-                                                "to fails. See response message for more information.")
+            @ApiResponse(responseCode = "400", description = "Bad Request,invalid format of the request. See response message " +
+                    "for more information."),
+            @ApiResponse(responseCode = "404", description = "Not found, the specified id does not exist."),
+            @ApiResponse(responseCode = "422", description = "Unprocessable entity,input parameters caused the processing to fail. See response message for more information.")
     })
     @GetMapping(
-        value    = "/product-composite/{productId}",
-        produces = "application/json")
-    ProductAggregate getProduct(@PathVariable int productId);
+            value    = "/product-composite/{productId}",
+            produces = "application/json")
+    Mono<ProductAggregate> getCompositeProduct(@PathVariable int productId);
 
     /**
      * Sample usage:
@@ -45,8 +42,8 @@ public interface ProductCompositeService {
      * @param body
      */
     @Operation(
-            summary = "${api.product-composite.create-composite-product.description}",
-            description = "${api.product-composite.create-composite-product.notes}")
+            summary = "${api.product-composite.create-composite-product.summary}",
+            description = "${api.product-composite.create-composite-product.description}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400",
                     description = "Bad Request, invalid format of the request. See response message for more information."),
@@ -66,8 +63,8 @@ public interface ProductCompositeService {
      * @param productId
      */
     @Operation(
-            summary = "${api.product-composite.delete-composite-product.description}",
-            description = "${api.product-composite.delete-composite-product.notes}")
+            summary = "${api.product-composite.delete-composite-product.summary}",
+            description = "${api.product-composite.delete-composite-product.description}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "Bad Request,invalid format of the request." +
                     "See response message for more information."),

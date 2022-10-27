@@ -8,10 +8,10 @@ import com.ap.api.composite.product.ServiceAddresses;
 import com.ap.api.core.product.Product;
 import com.ap.api.core.recommendation.Recommendation;
 import com.ap.api.core.review.Review;
-import com.ap.util.exceptions.NotFoundException;
 import com.ap.util.http.ServiceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,16 +29,14 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
     }
 
     @Override
-    public ProductAggregate getProduct(int productId) {
-        Product product = productCompositeIntegration.getProduct(productId);
-
-        if (product == null) throw new NotFoundException("No product found for productId: " + productId);
-
-        List<Recommendation> recommendations = productCompositeIntegration.getRecommendations(productId);
-
-        List<Review> reviews = productCompositeIntegration.getReviews(productId);
-
-        return createProductAggregate(product, recommendations, reviews, serviceUtil.getServiceAddress());
+    public Mono<ProductAggregate> getCompositeProduct(int productId) {
+        return Mono.zip(
+                           values -> createProductAggregate((Product) values[0], (List<Recommendation>) values[1], (List<Review>) values[2], serviceUtil.getServiceAddress()),
+                           productCompositeIntegration.getProduct(productId),
+                           productCompositeIntegration.getRecommendations(productId).collectList(),
+                           productCompositeIntegration.getReviews(productId).collectList())
+                   .doOnError(ex -> log.warn("getCompositeProduct failed: {}", ex.toString()))
+                   .log();
     }
 
     @Override
