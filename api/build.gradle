@@ -33,8 +33,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     //Swagger dependencies
-    implementation 'org.springdoc:springdoc-openapi-ui:1.6.12'
-    implementation 'org.springdoc:springdoc-openapi-webflux-ui:1.6.12'
+    implementation 'org.springdoc:springdoc-openapi-common:1.6.12'
 
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'

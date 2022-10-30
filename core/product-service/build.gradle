@@ -2,6 +2,7 @@ buildscript {
     ext {
         springBootVersion = '2.7.4'
         mapstructVersion = '1.5.3.Final'
+        springCloudVersion = "2021.0.4"
     }
 
     repositories {
@@ -54,6 +55,10 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
     testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
 
+    //Spring cloud stream for kafka rabbitmq and kafka
+    implementation 'org.springframework.cloud:spring-cloud-starter-stream-rabbit'
+    implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
+
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
@@ -71,4 +76,10 @@ dependencies {
     testImplementation('org.junit.jupiter:junit-jupiter-api:5.9.1')
     testImplementation('org.junit.jupiter:junit-jupiter-engine:5.9.1')
 
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }

@@ -11,26 +11,26 @@ import org.springframework.context.annotation.ComponentScan;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
-import java.util.concurrent.Executors;
-
 @Slf4j
 @ComponentScan("com.ap")
 @SpringBootApplication
 public class ReviewServiceApplication {
 
-	private final Integer connectionPoolSize;
+	private final Integer threadPoolSize;
+	private final Integer taskQueueSize;
 
 	@Autowired
 	public ReviewServiceApplication(
-			@Value("${spring.datasource.maximum-pool-size:10}")
-			Integer connectionPoolSize
+			@Value("${app.threadPoolSize:10}") Integer threadPoolSize,
+			@Value("${app.taskQueueSize:100}") Integer taskQueueSize
 								   ) {
-		this.connectionPoolSize = connectionPoolSize;
+		this.threadPoolSize = threadPoolSize;
+		this.taskQueueSize = taskQueueSize;
 	}
 	@Bean
 	public Scheduler jdbcScheduler() {
-		log.info("Creates a jdbcScheduler with connectionPoolSize = " + connectionPoolSize);
-		return Schedulers.fromExecutor(Executors.newFixedThreadPool(connectionPoolSize));
+		log.info("Creates a jdbcScheduler with thread pool size = {}", threadPoolSize);
+		return Schedulers.newBoundedElastic(threadPoolSize, taskQueueSize, "jdbc-pool");
 	}
 
 	public static void main(String[] args) {

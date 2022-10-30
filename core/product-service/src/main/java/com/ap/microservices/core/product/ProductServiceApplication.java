@@ -18,6 +18,7 @@ import org.springframework.data.mongodb.core.mapping.MongoPersistentEntity;
 import org.springframework.data.mongodb.core.mapping.MongoPersistentProperty;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 
+
 @ComponentScan("com.ap")
 @SpringBootApplication
 @EnableReactiveMongoRepositories

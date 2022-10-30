@@ -6,13 +6,18 @@ import com.ap.api.core.recommendation.Recommendation;
 import com.ap.api.core.recommendation.RecommendationService;
 import com.ap.api.core.review.Review;
 import com.ap.api.core.review.ReviewService;
+import com.ap.api.event.Event;
 import com.ap.util.exceptions.InvalidInputException;
 import com.ap.util.exceptions.NotFoundException;
 import com.ap.util.http.HttpErrorInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -20,9 +25,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 
 import java.io.IOException;
 
+import static com.ap.api.event.Event.Type.CREATE;
+import static com.ap.api.event.Event.Type.DELETE;
 import static reactor.core.publisher.Flux.empty;
 
 @Slf4j
@@ -31,12 +39,14 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
     private final RestTemplate restTemplate;
     private final ObjectMapper mapper;
-
     private final WebClient webClient;
     private final String productServiceUrl;
     private final String recommendationServiceUrl;
     private final String reviewServiceUrl;
 
+    private final StreamBridge streamBridge;
+
+    private final Scheduler publishEventScheduler;
     @Autowired
     public ProductCompositeIntegration(
             RestTemplate restTemplate,
@@ -49,12 +59,16 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
             @Value("${app.recommendation-service.port}") int    recommendationServicePort,
 
             @Value("${app.review-service.host}") String reviewServiceHost,
-            @Value("${app.review-service.port}") int    reviewServicePort
-                                      ) {
+            @Value("${app.review-service.port}") int    reviewServicePort,
+
+            StreamBridge streamBridge,
+            @Qualifier("publishEventScheduler") Scheduler publishEventScheduler) {
 
         this.restTemplate = restTemplate;
         this.mapper = mapper;
         this.webClient = webClient.build();
+        this.streamBridge = streamBridge;
+        this.publishEventScheduler = publishEventScheduler;
 
         productServiceUrl        = "http://" + productServiceHost + ":" + productServicePort + "/product/";
         recommendationServiceUrl = "http://" + recommendationServiceHost + ":" + recommendationServicePort + "/recommendation?productId=";
@@ -71,33 +85,18 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     }
 
     @Override
-    public Product createProduct(Product body) {
-        try {
-            String url = productServiceUrl;
-            log.debug("Will post a new product to URL: {}", url);
-
-            Product product = restTemplate.postForObject(url, body, Product.class);
-            log.debug("Created a product with id: {}", product.getProductId());
-
-            return product;
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+    public Mono<Product> createProduct(Product body) {
+        return Mono.fromCallable(() -> {
+            sendMessage("products-out-0", new Event(CREATE, body.getProductId(), body));
+            return body;
+        }).subscribeOn(publishEventScheduler);
     }
 
     @Override
-    public void deleteProduct(int productId) {
+    public Mono<Void> deleteProduct(int productId) {
 
-        try {
-            String url = productServiceUrl + "/" + productId;
-            log.debug("Will call the deleteProduct API on URL: {}", url);
-
-            restTemplate.delete(url);
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+        return Mono.fromRunnable(() -> sendMessage("products-out-0", new Event(DELETE, productId, null)))
+                   .subscribeOn(publishEventScheduler).then();
 
     }
 
@@ -113,35 +112,19 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     }
 
     @Override
-    public Recommendation createRecommendation(Recommendation body) {
+    public Mono<Recommendation> createRecommendation(Recommendation body) {
 
-        try {
-            String url = recommendationServiceUrl;
-            log.debug("Will post a new recommendation to URL: {}", url);
-
-            Recommendation recommendation = restTemplate.postForObject(url, body, Recommendation.class);
-            log.debug("Created a recommendation with id: {}", recommendation.getProductId());
-
-            return recommendation;
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+        return Mono.fromCallable(() -> {
+            sendMessage("recommendations-out-0", new Event(CREATE, body.getProductId(), body));
+            return body;
+        }).subscribeOn(publishEventScheduler);
     }
 
     @Override
-    public void deleteRecommendations(int productId) {
+    public Mono<Void> deleteRecommendations(int productId) {
 
-        try {
-            String url = recommendationServiceUrl + "?productId=" + productId;
-            log.debug("Will call the deleteRecommendations API on URL: {}", url);
-
-            restTemplate.delete(url);
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
-
+        return Mono.fromRunnable(() -> sendMessage("recommendations-out-0", new Event(DELETE, productId, null)))
+                   .subscribeOn(publishEventScheduler).then();
     }
 
     @Override
@@ -157,35 +140,20 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     }
 
     @Override
-    public Review createReview(Review body) {
+    public Mono<Review> createReview(Review body) {
 
-        try {
-            String url = reviewServiceUrl;
-            log.debug("Will post a new review to URL: {}", url);
-
-            Review review = restTemplate.postForObject(url, body, Review.class);
-            log.debug("Created a review with id: {}", review.getProductId());
-
-            return review;
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+        return Mono.fromCallable(() -> {
+            sendMessage("reviews-out-0", new Event(CREATE, body.getProductId(), body));
+            return body;
+        }).subscribeOn(publishEventScheduler);
 
     }
 
     @Override
-    public void deleteReviews(int productId) {
+    public Mono<Void> deleteReviews(int productId) {
 
-        try {
-            String url = reviewServiceUrl + "?productId=" + productId;
-            log.debug("Will call the deleteReviews API on URL: {}", url);
-
-            restTemplate.delete(url);
-
-        } catch (HttpClientErrorException ex) {
-            throw handleHttpClientException(ex);
-        }
+        return Mono.fromRunnable(() -> sendMessage("reviews-out-0", new Event(DELETE, productId, null)))
+                   .subscribeOn(publishEventScheduler).then();
 
     }
 
@@ -194,22 +162,6 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
             return mapper.readValue(ex.getResponseBodyAsString(), HttpErrorInfo.class).getMessage();
         } catch (IOException ioex) {
             return ex.getMessage();
-        }
-    }
-
-    private RuntimeException handleHttpClientException(HttpClientErrorException ex) {
-        switch (ex.getStatusCode()) {
-
-            case NOT_FOUND:
-                return new NotFoundException(getErrorMessage(ex));
-
-            case UNPROCESSABLE_ENTITY :
-                return new InvalidInputException(getErrorMessage(ex));
-
-            default:
-                log.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
-                log.warn("Error body: {}", ex.getResponseBodyAsString());
-                return ex;
         }
     }
 
@@ -243,6 +195,14 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         } catch (IOException ioex) {
             return ex.getMessage();
         }
+    }
+
+    private void sendMessage(String bindingName, Event event) {
+        log.debug("Sending a {} message to {}", event.getEventType(), bindingName);
+        Message message = MessageBuilder.withPayload(event)
+                                        .setHeader("partitionKey", event.getKey())
+                                        .build();
+        streamBridge.send(bindingName, message);
     }
 
 }

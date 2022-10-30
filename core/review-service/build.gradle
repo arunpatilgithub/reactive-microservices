@@ -2,6 +2,7 @@ buildscript {
     ext {
         springBootVersion = '2.7.4'
         mapstructVersion = '1.5.3.Final'
+        springCloudVersion = "2021.0.4"
     }
 
     repositories {
@@ -53,6 +54,10 @@ dependencies {
     //db for unit test cases
     testImplementation('com.h2database:h2')
 
+    //Spring cloud stream for kafka rabbitmq and kafka
+    implementation 'org.springframework.cloud:spring-cloud-starter-stream-rabbit'
+    implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
+
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
@@ -61,6 +66,12 @@ dependencies {
 
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 tasks.named('test') {

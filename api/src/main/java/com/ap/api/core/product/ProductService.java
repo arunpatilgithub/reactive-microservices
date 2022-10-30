@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import reactor.core.publisher.Mono;
 
-import java.util.concurrent.ExecutionException;
-
 public interface ProductService {
 
     /**
@@ -26,8 +24,8 @@ public interface ProductService {
             value    = "/product",
             consumes = "application/json",
             produces = "application/json")
-    Product createProduct(@RequestBody Product body) throws ExecutionException, InterruptedException;
+    Mono<Product> createProduct(@RequestBody Product body);
 
     @DeleteMapping(value = "/product/{productId}")
-    void deleteProduct(@PathVariable int productId);
+    Mono<Void> deleteProduct(@PathVariable int productId);
 }

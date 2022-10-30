@@ -53,7 +53,7 @@ public interface ProductCompositeService {
     @PostMapping(
             value    = "/product-composite",
             consumes = "application/json")
-    void createCompositeProduct(@RequestBody ProductAggregate body);
+    Mono<Void> createCompositeProduct(@RequestBody ProductAggregate body);
 
     /**
      * Sample usage:
@@ -72,5 +72,5 @@ public interface ProductCompositeService {
                     "processing to fail. See response message for more information.")
     })
     @DeleteMapping(value = "/product-composite/{productId}")
-    void deleteCompositeProduct(@PathVariable int productId);
+    Mono<Void> deleteProduct(@PathVariable int productId);
 }

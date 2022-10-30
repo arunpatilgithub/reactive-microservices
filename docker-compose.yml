@@ -7,7 +7,10 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   recommendation:
     build: core/recommendation-service
@@ -15,7 +18,10 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   review:
     build: core/review-service
@@ -25,6 +31,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   product-composite:
     build: core/product-composite-service
@@ -33,6 +41,9 @@ services:
       - "8081:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
   # $ mongo
   mongodb:
@@ -40,6 +51,12 @@ services:
     mem_limit: 350m
     ports:
       - "27017:27017"
+    command: mongod
+    healthcheck:
+      test: echo 'db.stats().ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
   # $ mysql -uroot -h127.0.0.1 -p
   mysql:
     image: mysql:latest
@@ -56,3 +73,15 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+
+  rabbitmq:
+    image: rabbitmq:management
+    mem_limit: 512m
+    ports:
+      - 5672:5672
+      - 15672:15672
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 5s
+      timeout: 2s
+      retries: 60

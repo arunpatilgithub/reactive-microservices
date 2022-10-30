@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.concurrent.ExecutionException;
+import static java.util.logging.Level.FINE;
 
 @Slf4j
 @RestController
@@ -35,35 +35,51 @@ public class RecommendationServiceImpl implements RecommendationService {
     @Override
     public Flux<Recommendation> getRecommendations(int productId) {
 
-        if (productId < 1) throw new InvalidInputException("Invalid productId: " + productId);
+        if (productId < 1) {
+            throw new InvalidInputException("Invalid productId: " + productId);
+        }
+
+        log.info("Will get recommendations for product with id={}", productId);
 
         return repository.findByProductId(productId)
-                         .log()
+                         .log(log.getName(), FINE)
                          .map(e -> mapper.entityToApi(e))
-                         .map(e -> {e.setServiceAddress(serviceUtil.getServiceAddress()); return e;});
+                         .map(e -> setServiceAddress(e));
     }
 
     @Override
-    public Recommendation createRecommendation(Recommendation body) throws ExecutionException, InterruptedException {
+    public Mono<Recommendation> createRecommendation(Recommendation body) {
 
-        if (body.getProductId() < 1) throw new InvalidInputException("Invalid productId: " + body.getProductId());
+        if (body.getProductId() < 1) {
+            throw new InvalidInputException("Invalid productId: " + body.getProductId());
+        }
 
         RecommendationEntity entity = mapper.apiToEntity(body);
         Mono<Recommendation> newEntity = repository.save(entity)
-                                                   .log()
+                                                   .log(log.getName(), FINE)
                                                    .onErrorMap(
                                                            DuplicateKeyException.class,
                                                            ex -> new InvalidInputException("Duplicate key, Product Id: " + body.getProductId() + ", Recommendation Id:" + body.getRecommendationId()))
                                                    .map(e -> mapper.entityToApi(e));
 
-        return newEntity.toFuture().get();
+        return newEntity;
     }
 
     @Override
-    public void deleteRecommendations(int productId) {
+    public Mono<Void> deleteRecommendations(int productId) {
+
+        if (productId < 1) {
+            throw new InvalidInputException("Invalid productId: " + productId);
+        }
 
         log.debug("deleteRecommendations: tries to delete recommendations for the product with productId: {}",
                  productId);
-        repository.deleteAll(repository.findByProductId(productId));
+        return repository.deleteAll(repository.findByProductId(productId));
     }
+
+    private Recommendation setServiceAddress(Recommendation e) {
+        e.setServiceAddress(serviceUtil.getServiceAddress());
+        return e;
+    }
+
 }

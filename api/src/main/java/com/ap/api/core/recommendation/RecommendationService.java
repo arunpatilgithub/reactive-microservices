@@ -6,8 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import reactor.core.publisher.Flux;
-
-import java.util.concurrent.ExecutionException;
+import reactor.core.publisher.Mono;
 
 public interface RecommendationService {
 
@@ -38,7 +37,7 @@ public interface RecommendationService {
             value    = "/recommendation",
             consumes = "application/json",
             produces = "application/json")
-    Recommendation createRecommendation(@RequestBody Recommendation body) throws ExecutionException, InterruptedException;
+    Mono<Recommendation> createRecommendation(@RequestBody Recommendation body);
 
     /**
      * Sample usage:
@@ -48,5 +47,5 @@ public interface RecommendationService {
      * @param productId
      */
     @DeleteMapping(value = "/recommendation")
-    void deleteRecommendations(@RequestParam(value = "productId", required = true)  int productId);
+    Mono<Void> deleteRecommendations(@RequestParam(value = "productId", required = true)  int productId);
 }
