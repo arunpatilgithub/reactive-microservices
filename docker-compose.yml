@@ -85,3 +85,8 @@ services:
       interval: 5s
       timeout: 2s
       retries: 60
+  eureka:
+    build: eureka-server
+    mem_limit: 512m
+    ports:
+      - "8761:8761"

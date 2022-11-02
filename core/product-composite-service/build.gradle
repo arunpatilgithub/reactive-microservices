@@ -38,6 +38,8 @@ dependencies {
     //Swagger dependencies
     implementation 'org.springdoc:springdoc-openapi-webflux-ui:1.6.12'
 
+    //service discovery
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'

@@ -6,6 +6,19 @@ logging:
     root: INFO
     com.ap: DEBUG
 
+spring.application.name: product
+app.eureka-server: localhost
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${app.eureka-server}:8761/eureka/
+    initialInstanceInfoReplicationIntervalSeconds: 5
+    registryFetchIntervalSeconds: 5
+  instance:
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
+
 spring.data.mongodb:
   host: localhost
   port: 27017
@@ -56,6 +69,7 @@ server.port: 8080
 spring.data.mongodb.host: mongodb
 spring.rabbitmq.host: rabbitmq
 spring.cloud.stream.kafka.binder.brokers: kafka
+app.eureka-server: eureka
 
 ---
 spring.config.activate.on-profile: streaming_partitioned

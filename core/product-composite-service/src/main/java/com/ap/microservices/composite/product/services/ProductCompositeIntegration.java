@@ -37,47 +37,32 @@ import static reactor.core.publisher.Flux.empty;
 @Component
 public class ProductCompositeIntegration implements ProductService, RecommendationService, ReviewService {
 
-    private final RestTemplate restTemplate;
     private final ObjectMapper mapper;
     private final WebClient webClient;
-    private final String productServiceUrl;
-    private final String recommendationServiceUrl;
-    private final String reviewServiceUrl;
+    private static final String PRODUCT_SERVICE_URL = "http://product";
+    private static final String RECOMMENDATION_SERVICE_URL = "http://recommendation";
+    private static final String REVIEW_SERVICE_URL = "http://review";
 
     private final StreamBridge streamBridge;
 
     private final Scheduler publishEventScheduler;
     @Autowired
     public ProductCompositeIntegration(
-            RestTemplate restTemplate,
             ObjectMapper mapper,
-
-            WebClient.Builder webClient, @Value("${app.product-service.host}") String productServiceHost,
-            @Value("${app.product-service.port}") int    productServicePort,
-
-            @Value("${app.recommendation-service.host}") String recommendationServiceHost,
-            @Value("${app.recommendation-service.port}") int    recommendationServicePort,
-
-            @Value("${app.review-service.host}") String reviewServiceHost,
-            @Value("${app.review-service.port}") int    reviewServicePort,
-
+            WebClient.Builder webClient,
             StreamBridge streamBridge,
             @Qualifier("publishEventScheduler") Scheduler publishEventScheduler) {
 
-        this.restTemplate = restTemplate;
         this.mapper = mapper;
         this.webClient = webClient.build();
         this.streamBridge = streamBridge;
         this.publishEventScheduler = publishEventScheduler;
 
-        productServiceUrl        = "http://" + productServiceHost + ":" + productServicePort + "/product/";
-        recommendationServiceUrl = "http://" + recommendationServiceHost + ":" + recommendationServicePort + "/recommendation?productId=";
-        reviewServiceUrl         = "http://" + reviewServiceHost + ":" + reviewServicePort + "/review?productId=";
     }
 
     @Override
     public Mono<Product> getProduct(int productId) {
-        String url = productServiceUrl + "/" + productId;
+        String url = PRODUCT_SERVICE_URL + "/product/" + productId;
         log.debug("Will call the getProduct API on URL: {}", url);
 
         return webClient.get().uri(url).retrieve().bodyToMono(Product.class).log().onErrorMap(
@@ -103,7 +88,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     @Override
     public Flux<Recommendation> getRecommendations(int productId) {
 
-        String url = recommendationServiceUrl + productId;
+        String url = RECOMMENDATION_SERVICE_URL + "/recommendation?productId=" + productId;
 
         log.debug("Will call the getRecommendations API on URL: {}", url);
 
@@ -130,7 +115,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     @Override
     public Flux<Review> getReviews(int productId) {
 
-        String url = reviewServiceUrl + productId;
+        String url = REVIEW_SERVICE_URL + "/review?productId=" + productId;
 
         log.debug("Will call the getReviews API on URL: {}", url);
 
